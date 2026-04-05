@@ -430,6 +430,32 @@
     .footer-text { font-size: 11px; color: var(--text3); font-weight: 500; line-height: 1.8; }
     .footer-text a { color: var(--text2); text-decoration: none; }
     .footer-text a:hover { color: var(--text); }
+
+    /* ── BLACK LAB DOG ── */
+    #lab-dog {
+      position: fixed;
+      bottom: 16px;
+      right: 20px;
+      z-index: 500;
+      width: 72px;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.6));
+      animation: dog-idle 2.8s ease-in-out infinite;
+    }
+    @keyframes dog-idle {
+      0%, 100% { transform: translateY(0px); }
+      40%       { transform: translateY(-5px); }
+      70%       { transform: translateY(-2px); }
+    }
+    .dog-tail {
+      transform-origin: 14px 54px;
+      animation: wag 0.52s ease-in-out infinite alternate;
+    }
+    @keyframes wag {
+      from { transform: rotate(-30deg); }
+      to   { transform: rotate(20deg); }
+    }
   </style>
 </head>
 <body>
@@ -689,6 +715,105 @@
       Data sourced from <a href="https://www.espncricinfo.com/series/ipl-2026-1510719/points-table-standings" target="_blank">ESPNcricinfo</a> · Season ends 25 May 2026
     </div>
   </div>
+
+  <!-- ── BLACK LAB DOG (bottom-right corner) ── -->
+  <div id="lab-dog" title="🐾 Good boy!">
+    <svg viewBox="0 0 82 84" xmlns="http://www.w3.org/2000/svg">
+      <!-- Tail — pivots at body attachment, animated by .dog-tail -->
+      <g class="dog-tail">
+        <path d="M14 54 Q2 40 9 24" stroke="#1a1a1a" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- Body -->
+      <ellipse cx="39" cy="57" rx="25" ry="15" fill="#1d1d1d"/>
+      <!-- Neck -->
+      <ellipse cx="58" cy="45" rx="10" ry="9" fill="#1d1d1d"/>
+      <!-- Head -->
+      <circle cx="63" cy="27" r="17" fill="#1d1d1d"/>
+      <!-- Floppy ear -->
+      <ellipse cx="54" cy="23" rx="9" ry="14" fill="#111" transform="rotate(-15 54 23)"/>
+      <!-- Eye white -->
+      <circle cx="70" cy="22" r="4" fill="#fffef0"/>
+      <!-- Pupil -->
+      <circle cx="70.8" cy="22.6" r="2.4" fill="#0d0d0d"/>
+      <!-- Eye highlight -->
+      <circle cx="71.9" cy="21.1" r="1" fill="#fffef0"/>
+      <!-- Snout -->
+      <ellipse cx="76" cy="33" rx="8.5" ry="5.5" fill="#242424"/>
+      <!-- Nose -->
+      <ellipse cx="82" cy="31" rx="4" ry="2.8" fill="#080808"/>
+      <!-- Nostril hint -->
+      <path d="M80 31.8 Q82 33.4 84 31.8" stroke="#1a1a1a" stroke-width="0.9" fill="none"/>
+      <!-- Front legs (two, slightly staggered for depth) -->
+      <rect x="53" y="67" width="9" height="16" rx="4.5" fill="#1d1d1d"/>
+      <rect x="43" y="68" width="9" height="15" rx="4.5" fill="#191919"/>
+      <!-- Back legs -->
+      <rect x="27" y="67" width="9" height="16" rx="4.5" fill="#1d1d1d"/>
+      <rect x="17" y="68" width="9" height="15" rx="4.5" fill="#191919"/>
+      <!-- Paw groove lines -->
+      <path d="M55 83 Q57.5 84.5 61 83"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M45 82 Q47.5 83.5 51 82"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M29 83 Q31.5 84.5 35 83"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M19 82 Q21.5 83.5 25 82"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- ── FIREWORKS (canvas burst, 2 seconds, self-cleaning) ── -->
+  <script>
+  (function(){
+    var W=window.innerWidth, H=window.innerHeight;
+    var cv=document.createElement('canvas');
+    cv.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+    cv.width=W; cv.height=H;
+    document.body.appendChild(cv);
+    var ctx=cv.getContext('2d');
+    var pts=[];
+    var cols=['#ffd700','#ff6b6b','#4db8ff','#4ade80','#c080ff','#ff8533','#ff9500','#fff','#ffb347','#87ceeb'];
+
+    function Pt(x,y){
+      this.x=x; this.y=y;
+      var a=Math.random()*Math.PI*2, s=Math.random()*8+2;
+      this.vx=Math.cos(a)*s; this.vy=Math.sin(a)*s;
+      this.col=cols[0|Math.random()*cols.length];
+      this.r=Math.random()*3.5+1.2;
+      this.life=1; this.dec=Math.random()*0.018+0.012;
+    }
+
+    function burst(x,y){
+      for(var i=0;i<60;i++) pts.push(new Pt(x,y));
+    }
+
+    /* Spread bursts across the viewport over ~1.6s */
+    var spots=[[.25,.30],[.50,.16],[.75,.30],[.28,.60],[.72,.46],[.50,.40],[.14,.44],[.86,.36],[.40,.22],[.62,.55]];
+    var bi=0, burstTmr=setInterval(function(){
+      if(bi<spots.length){ burst(W*spots[bi][0], H*spots[bi][1]); bi++; }
+      else clearInterval(burstTmr);
+    }, 170);
+
+    var raf;
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(var i=pts.length-1;i>=0;i--){
+        var p=pts[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.13; p.life-=p.dec;
+        if(p.life<=0){ pts.splice(i,1); continue; }
+        ctx.globalAlpha=p.life;
+        ctx.fillStyle=p.col;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,6.2832);
+        ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      raf=requestAnimationFrame(draw);
+    })();
+
+    /* Kill everything at 2 s — canvas removed, no trace left */
+    setTimeout(function(){
+      clearInterval(burstTmr);
+      cancelAnimationFrame(raf);
+      cv.remove();
+    }, 2000);
+  })();
+  </script>
 
 </body>
 </html>
