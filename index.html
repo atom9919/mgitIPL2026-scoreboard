@@ -431,30 +431,51 @@
     .footer-text a { color: var(--text2); text-decoration: none; }
     .footer-text a:hover { color: var(--text); }
 
-    /* ── BLACK LAB DOG ── */
+    /* ── YELLOW LAB DOG (walks across the bottom) ── */
     #lab-dog {
       position: fixed;
-      bottom: 16px;
-      right: 20px;
+      bottom: 10px;
+      left: 0;              /* JS drives horizontal position */
       z-index: 500;
-      width: 72px;
+      width: 90px;
       pointer-events: none;
       user-select: none;
-      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.6));
-      animation: dog-idle 2.8s ease-in-out infinite;
+      filter: drop-shadow(0 5px 14px rgba(0,0,0,0.45));
     }
-    @keyframes dog-idle {
+    /* Body bobs as dog walks */
+    #dog-svg { animation: walk-bob 0.46s ease-in-out infinite; }
+    @keyframes walk-bob {
       0%, 100% { transform: translateY(0px); }
-      40%       { transform: translateY(-5px); }
-      70%       { transform: translateY(-2px); }
+      50%       { transform: translateY(-5px); }
     }
+    /* Tail always wagging */
     .dog-tail {
-      transform-origin: 14px 54px;
-      animation: wag 0.52s ease-in-out infinite alternate;
+      transform-origin: 19px 48px;
+      animation: wag 0.44s ease-in-out infinite alternate;
     }
     @keyframes wag {
-      from { transform: rotate(-30deg); }
-      to   { transform: rotate(20deg); }
+      from { transform: rotate(-34deg); }
+      to   { transform: rotate(24deg); }
+    }
+    /* Leg pair A: far-front + near-back  (diagonal pair) */
+    .leg-a {
+      transform-box: fill-box;
+      transform-origin: top center;
+      animation: leg-swing-a 0.46s ease-in-out infinite;
+    }
+    /* Leg pair B: far-back + near-front  (opposite diagonal) */
+    .leg-b {
+      transform-box: fill-box;
+      transform-origin: top center;
+      animation: leg-swing-b 0.46s ease-in-out infinite;
+    }
+    @keyframes leg-swing-a {
+      0%, 100% { transform: rotate(-22deg); }
+      50%       { transform: rotate(22deg); }
+    }
+    @keyframes leg-swing-b {
+      0%, 100% { transform: rotate(22deg); }
+      50%       { transform: rotate(-22deg); }
     }
   </style>
 </head>
@@ -716,46 +737,107 @@
     </div>
   </div>
 
-  <!-- ── BLACK LAB DOG (bottom-right corner) ── -->
+  <!-- ── YELLOW LAB DOG (walks back and forth along the bottom) ── -->
   <div id="lab-dog" title="🐾 Good boy!">
-    <svg viewBox="0 0 82 84" xmlns="http://www.w3.org/2000/svg">
-      <!-- Tail — pivots at body attachment, animated by .dog-tail -->
+    <svg id="dog-svg" viewBox="0 0 102 82" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ░░ Tail (pivots at rear body, animated by .dog-tail) ░░ -->
       <g class="dog-tail">
-        <path d="M14 54 Q2 40 9 24" stroke="#1a1a1a" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+        <path d="M19 48 Q4 36 11 20" stroke="#b87820" stroke-width="7.5"
+              fill="none" stroke-linecap="round"/>
       </g>
-      <!-- Body -->
-      <ellipse cx="39" cy="57" rx="25" ry="15" fill="#1d1d1d"/>
-      <!-- Neck -->
-      <ellipse cx="58" cy="45" rx="10" ry="9" fill="#1d1d1d"/>
-      <!-- Head -->
-      <circle cx="63" cy="27" r="17" fill="#1d1d1d"/>
-      <!-- Floppy ear -->
-      <ellipse cx="54" cy="23" rx="9" ry="14" fill="#111" transform="rotate(-15 54 23)"/>
-      <!-- Eye white -->
-      <circle cx="70" cy="22" r="4" fill="#fffef0"/>
-      <!-- Pupil -->
-      <circle cx="70.8" cy="22.6" r="2.4" fill="#0d0d0d"/>
-      <!-- Eye highlight -->
-      <circle cx="71.9" cy="21.1" r="1" fill="#fffef0"/>
-      <!-- Snout -->
-      <ellipse cx="76" cy="33" rx="8.5" ry="5.5" fill="#242424"/>
-      <!-- Nose -->
-      <ellipse cx="82" cy="31" rx="4" ry="2.8" fill="#080808"/>
-      <!-- Nostril hint -->
-      <path d="M80 31.8 Q82 33.4 84 31.8" stroke="#1a1a1a" stroke-width="0.9" fill="none"/>
-      <!-- Front legs (two, slightly staggered for depth) -->
-      <rect x="53" y="67" width="9" height="16" rx="4.5" fill="#1d1d1d"/>
-      <rect x="43" y="68" width="9" height="15" rx="4.5" fill="#191919"/>
-      <!-- Back legs -->
-      <rect x="27" y="67" width="9" height="16" rx="4.5" fill="#1d1d1d"/>
-      <rect x="17" y="68" width="9" height="15" rx="4.5" fill="#191919"/>
-      <!-- Paw groove lines -->
-      <path d="M55 83 Q57.5 84.5 61 83"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-      <path d="M45 82 Q47.5 83.5 51 82"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-      <path d="M29 83 Q31.5 84.5 35 83"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-      <path d="M19 82 Q21.5 83.5 25 82"   stroke="#111" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+
+      <!-- ░░ Far legs — drawn first (below body, slightly darker) ░░ -->
+      <!-- far-back  → leg pair B -->
+      <g class="leg-b">
+        <rect x="24" y="61" width="10" height="20" rx="5" fill="#c07818"/>
+      </g>
+      <!-- far-front → leg pair A -->
+      <g class="leg-a">
+        <rect x="64" y="61" width="10" height="20" rx="5" fill="#c07818"/>
+      </g>
+
+      <!-- ░░ Body ░░ -->
+      <ellipse cx="47" cy="54" rx="31" ry="16" fill="#d4922b"/>
+      <!-- belly highlight -->
+      <ellipse cx="47" cy="66" rx="21" ry="6" fill="rgba(240,200,90,0.22)"/>
+
+      <!-- ░░ Neck + Head ░░ -->
+      <ellipse cx="72" cy="43" rx="13" ry="11" fill="#d4922b"/>
+      <circle  cx="77" cy="27" r="18"          fill="#d4922b"/>
+
+      <!-- ░░ Floppy ear ░░ -->
+      <ellipse cx="67" cy="24" rx="11" ry="16" fill="#b47018"
+               transform="rotate(-12 67 24)"/>
+
+      <!-- ░░ Near legs — drawn last (on top of body sides) ░░ -->
+      <!-- near-back  → leg pair A -->
+      <g class="leg-a">
+        <rect x="19" y="64" width="11" height="19" rx="5.5" fill="#d4922b"/>
+      </g>
+      <!-- near-front → leg pair B -->
+      <g class="leg-b">
+        <rect x="70" y="64" width="11" height="19" rx="5.5" fill="#d4922b"/>
+      </g>
+
+      <!-- ░░ Eye ░░ -->
+      <circle cx="85" cy="22" r="4.5" fill="#3a1e0a"/>
+      <circle cx="86.6" cy="20.6" r="1.7" fill="#fff"/>
+
+      <!-- ░░ Snout + Nose ░░ -->
+      <ellipse cx="91" cy="33" rx="10" ry="7"    fill="#c47820"/>
+      <ellipse cx="98" cy="31" rx="4.8" ry="3.4" fill="#2d1206"/>
+      <!-- nostril -->
+      <path d="M96 32.5 Q98 34.5 100 32.5" stroke="#1a0a04"
+            stroke-width="0.9" fill="none"/>
+      <!-- smile -->
+      <path d="M91 38 Q94 42 98 38" stroke="#8a4810"
+            stroke-width="1.3" fill="none" stroke-linecap="round"/>
+
     </svg>
   </div>
+
+  <!-- ── YELLOW LAB WALKING BEHAVIOUR ── -->
+  <script>
+  (function(){
+    var dog  = document.getElementById('lab-dog');
+    var dogW = 90;                          /* matches CSS width */
+    var W    = window.innerWidth;
+    var x    = W - dogW - 24;              /* start near right edge */
+    var dir  = -1;                         /* -1 = left, +1 = right */
+    var speed   = 0.75;                    /* px per frame (~45 px/s) */
+    var pausing = false;
+    var pauseEnd = 0;
+
+    /* Flip the whole container; SVG is drawn facing right */
+    function setDir(d) {
+      dir = d;
+      dog.style.transform = d === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+    }
+    function doPause() {
+      if (Math.random() < 0.60) {          /* 60 % chance of a rest */
+        pausing  = true;
+        pauseEnd = performance.now() + 1500 + Math.random() * 2500;
+      }
+    }
+
+    setDir(-1);                            /* start walking left */
+    dog.style.left = x + 'px';
+
+    function step(ts) {
+      if (!pausing) {
+        x += dir * speed;
+        if (x <= 0)        { x = 0;        setDir(1);  doPause(); }
+        else if (x >= W - dogW) { x = W - dogW; setDir(-1); doPause(); }
+        dog.style.left = x + 'px';
+      } else if (ts > pauseEnd) {
+        pausing = false;
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+  </script>
 
   <!-- ── FIREWORKS (canvas burst, 2 seconds, self-cleaning) ── -->
   <script>
